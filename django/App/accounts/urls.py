@@ -21,9 +21,13 @@ from . import views
 
 urlpatterns = [
     path('customers/<int:id>',views.customers,name='customers.show'),
+    path('customer_profile/',views.customers_profile,name='customers.customer_profile'),
     path('product_page/',views.product,name='products'),
     path('',views.dashboard,name='dashboard'),
     path('order/create/<int:customerID>',views.ordercreate,name='order.create'),
     path('order/update/<int:orderID>',views.orderupdate,name='order.update'),
     path('order/delete/<int:orderID>',views.orderdelete,name='order.delete'),
+    path('register/',views.register,name='register'),
+    path('login/',views.userlogin,name="userlogin"),
+    path('logout/',views.userlogout,name="userlogout")
 ]
