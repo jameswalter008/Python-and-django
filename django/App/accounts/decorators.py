@@ -22,7 +22,7 @@ def admin_only(view_fun):
 
 def allowed_roles(roles=[]):
     def decorator(view_fun):
-        def wrapper(request,*args, **kwargs):
+        def wrapper(request,*args, **kwargs):#argument and keyword argument
             if request.user.groups.first().name in roles:
                 return view_fun(request,*args, **kwargs)#orderCreate
             else:

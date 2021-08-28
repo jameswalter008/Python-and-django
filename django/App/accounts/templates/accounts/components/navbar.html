@@ -18,6 +18,7 @@
         {% endif %}
         {% if request.user.is_authenticated %}
             <div class="text-white">
+                <img src="{{request.user.customer.profile_pic}}" width="50px" height="50px" style="border-radius=50%" class="me-3" >
                 <span class="me-5">{{request.user.username}}</span>
                 <a href="{% url 'userlogout'%}">logout</a>
             </div>

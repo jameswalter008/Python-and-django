@@ -1,3 +1,4 @@
+from django.contrib.auth.models import Group
 from accounts.decorators import authenticated_user,admin_only,allowed_roles
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
@@ -11,6 +12,21 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/login')
+@allowed_roles(roles=['admin','customer'])
+def customers_profile(request):
+    orders=request.user.customer.order_set.all()
+    total=orders.count()
+    delivered=orders.filter(status="delivered").count()
+    pending=orders.filter(status="pending").count()
+    return render(request,'accounts/customerprofile.html',{
+        'orders':orders,
+        'total':total,
+        'delivered':delivered,
+        'pending':pending
+    })
+
+@login_required(login_url='/login')
+@allowed_roles(roles=['admin'])
 # Create your views here.
 def customers(request,id):
     customers=Customer.objects.get(id=id)
@@ -26,6 +42,7 @@ def customers(request,id):
     })
 
 @login_required(login_url='/login')
+@allowed_roles(roles=['admin'])
 def product(request):
     products=Product.objects.all()
     return render(request,'accounts/products.html',{
@@ -67,6 +84,7 @@ def ordercreate(request,customerID):
     })
 
 @login_required(login_url='/login')
+@allowed_roles(roles=['admin'])
 def orderupdate(request,orderID):
     order=Order.objects.get(id=orderID);
     form=OrderForm(instance=order)
@@ -84,6 +102,7 @@ def orderupdate(request,orderID):
     )
 
 @login_required(login_url='/login')
+@allowed_roles(roles=['admin'])
 def orderdelete(request,orderID):
     order=Order.objects.get(id=orderID);
     if request.method=="POST":
@@ -102,7 +121,14 @@ def register(request):
     if request.method=="POST":
         form=RegisterForm(request.POST)
         if form.is_valid():
-            form.save()
+            user=form.save()
+            #add customer group as default
+            gp=Group.objects.get(name='customer')
+            user.groups.add(gp)  #many to many relationship between user and groups
+            #create customer profile for user
+            Customer.objects.create(user=user)
+            #login
+            login(request,user)
             return redirect('/')
     return render(request, 'accounts/register.html',{
         'form':form
@@ -123,9 +149,9 @@ def userlogin(request):
             return redirect("/login")
     return render(request, 'accounts/login.html')
 
+@login_required(login_url='/login')
 def userlogout(request):
     logout(request)
     return redirect("/login")
 
-def customers_profile(request):
-    return render(request,'accounts/customerprofile.html')
+
