@@ -1,11 +1,11 @@
 # global variable
-name='aungkhantmoe'
+# name='aungkhantmoe'
 
 def saymyname():
     # local
     global name
     name='aungaung'
-    print(name)
+    # print(name)
 saymyname();
 
 print(name);
